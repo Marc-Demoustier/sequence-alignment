@@ -1,5 +1,6 @@
 import argparse
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Apply the Burrow-Wheeler transform on the infile and output the '
                                                'transformation in the outfile')
@@ -9,6 +10,7 @@ def parse_arguments():
     parser.add_argument('--compress', help='save the compressed version of the Burrow-Wheeler transform',
                         action='store_true')
     return parser.parse_args()
+
 
 def read_infile(infile):
     sequence = ''
@@ -31,10 +33,13 @@ def generate_outfile(args, sequence):
     print(c, n, p, f)
     print(sequence)
 
+
 def bw_build():
     args = parse_arguments()
 
     sequence = read_infile(args.infile)
     generate_outfile(args, sequence)
 
-bw_build()
+
+if __name__ == "__main__":
+    bw_build()
