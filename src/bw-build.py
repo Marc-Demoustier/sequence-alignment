@@ -25,11 +25,11 @@ def read_infile(infile):
 
 def burrow_wheeler_transform(sequence, frequency):
     sequence += '$'
-    positions_index = []
 
     table = sorted(sequence[i:] + sequence[:i] for i in range(len(sequence)))  # Table of rotations of string
-    for i in range(0, len(table), frequency):
-        positions_index.append(str(len(table) - table[i].index('$') - 1))
+
+    # create list of indexes (position of $)
+    positions_index = [str(len(table) - table[i].index('$') - 1) for i in range(0, len(table), frequency)]
 
     last_column = [row[-1:] for row in table]  # Last characters of each row
     return "".join(last_column), positions_index
