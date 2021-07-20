@@ -40,7 +40,7 @@ def generate_outfile(args, sequence):
 
     c = 1 if args.compress else 0
     n = bw.index('$') if args.compress else 0
-    p = 0 # FIXME: A adds at the end of the transform with compression for being a multiple of 4
+    p = 4 - (len(bw) - 1) % 4 if args.compress and (len(bw) - 1) % 4 != 0 else 0
     f = args.f
 
     positions_index_str = ','.join(positions_index)
@@ -48,7 +48,31 @@ def generate_outfile(args, sequence):
     with open(args.outfile, 'w') as output_file:
         output_file.write(f'{c} {n} {p} {f}\n')
         output_file.write(f'{positions_index_str}\n')
-        output_file.write(bw)
+
+    if args.compress:
+        compress_dict = {
+            'A': 0b00,
+            'C': 0b01,
+            'G': 0b10,
+            'T': 0b11
+        }
+
+        bw = bw.replace('$', '') # remove the $
+        bw += 'A' * p
+
+        bw_compressed = []
+        for i in range(0, len(bw), 4):
+            byte_char = compress_dict[bw[i + 3]]
+            for j in range(2, -1, -1):
+                byte_char = byte_char << 2
+                byte_char += compress_dict[bw[i + j]]
+            bw_compressed.append(byte_char)
+
+        with open(args.outfile, 'ab') as output_file:
+            output_file.write(bytearray(bw_compressed))
+    else:
+        with open(args.outfile, 'a') as output_file:
+            output_file.write(bw)
 
 
 def bw_build():
