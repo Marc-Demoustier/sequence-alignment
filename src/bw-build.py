@@ -10,4 +10,31 @@ def parse_arguments():
                         action='store_true')
     return parser.parse_args()
 
-print(parse_arguments())
+def read_infile(infile):
+    sequence = ''
+
+    with open(infile, 'r') as input_file:
+        # process the file
+        line = input_file.readline()
+        while (line):
+            line = input_file.readline()[:-1]
+            sequence += line
+    return sequence
+
+
+def generate_outfile(args, sequence):
+    c = 1 if args.compress else 0
+    n = 0 # FIXME: $ position
+    p = 0 # FIXME: A adds at the end of the transform with compression for being a multiple of 4
+    f = args.f
+
+    print(c, n, p, f)
+    print(sequence)
+
+def bw_build():
+    args = parse_arguments()
+
+    sequence = read_infile(args.infile)
+    generate_outfile(args, sequence)
+
+bw_build()
