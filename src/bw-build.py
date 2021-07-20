@@ -16,7 +16,6 @@ def read_infile(infile):
     sequence = ''
 
     with open(infile, 'r') as input_file:
-        # process the file
         line = input_file.readline()
         while (line):
             line = input_file.readline()[:-1] # remove the \n at the end of each line
@@ -24,32 +23,39 @@ def read_infile(infile):
     return sequence
 
 
-def burrow_wheeler_transform(sequence):
+def burrow_wheeler_transform(sequence, frequency):
     sequence += '$'
+    positions_index = []
 
     table = sorted(sequence[i:] + sequence[:i] for i in range(len(sequence)))  # Table of rotations of string
+    for i in range(0, len(table), frequency):
+        positions_index.append(str(len(table) - table[i].index('$') - 1))
+
     last_column = [row[-1:] for row in table]  # Last characters of each row
-    return "".join(last_column)
+    return "".join(last_column), positions_index
 
 
-def generate_outfile(args, bw):
+def generate_outfile(args, sequence):
+    bw, positions_index = burrow_wheeler_transform(sequence, args.f)
+
     c = 1 if args.compress else 0
     n = bw.index('$') if args.compress else 0
     p = 0 # FIXME: A adds at the end of the transform with compression for being a multiple of 4
     f = args.f
 
+    positions_index_str = ','.join(positions_index)
+
     with open(args.outfile, 'w') as output_file:
         output_file.write(f'{c} {n} {p} {f}\n')
-        output_file.write('0\n')
-        output_file.write(burrow_wheeler_transform(bw))
+        output_file.write(f'{positions_index_str}\n')
+        output_file.write(bw)
 
 
 def bw_build():
     args = parse_arguments()
 
     sequence = read_infile(args.infile)
-    bw = burrow_wheeler_transform(sequence)
-    generate_outfile(args, bw)
+    generate_outfile(args, sequence)
 
 
 if __name__ == "__main__":
