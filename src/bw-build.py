@@ -1,6 +1,5 @@
 import argparse
 
-
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Apply the Burrow-Wheeler transform on the infile and output the '
                                                'transformation in the outfile')
