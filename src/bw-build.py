@@ -8,6 +8,8 @@ def parse_arguments():
     parser.add_argument('f', action='store', help='define the index creation frequency', type=int)
     parser.add_argument('--compress', help='save the compressed version of the Burrow-Wheeler transform',
                         action='store_true')
+    parser.add_argument('--progressive', help='create the index with a progressive version using parameter k',
+                        action='store_true')
     return parser.parse_args()
 
 
@@ -34,6 +36,28 @@ def burrow_wheeler_transform(sequence, frequency):
     return "".join(last_column), positions_index
 
 
+def compress_sequence(bw, p):
+    compress_dict = {
+        'A': 0b00,
+        'C': 0b01,
+        'G': 0b10,
+        'T': 0b11
+    }
+
+    bw = bw.replace('$', '') # remove the $
+    bw += 'A' * p
+
+    bw_compressed = []
+    for i in range(0, len(bw), 4):
+        byte_char = compress_dict[bw[i + 3]]
+        for j in range(2, -1, -1):
+            byte_char = byte_char << 2
+            byte_char += compress_dict[bw[i + j]]
+        bw_compressed.append(byte_char)
+
+    return bw_compressed
+
+
 def generate_outfile(args, sequence):
     bw, positions_index = burrow_wheeler_transform(sequence, args.f)
 
@@ -49,23 +73,7 @@ def generate_outfile(args, sequence):
         output_file.write(f'{positions_index_str}\n')
 
     if args.compress:
-        compress_dict = {
-            'A': 0b00,
-            'C': 0b01,
-            'G': 0b10,
-            'T': 0b11
-        }
-
-        bw = bw.replace('$', '') # remove the $
-        bw += 'A' * p
-
-        bw_compressed = []
-        for i in range(0, len(bw), 4):
-            byte_char = compress_dict[bw[i + 3]]
-            for j in range(2, -1, -1):
-                byte_char = byte_char << 2
-                byte_char += compress_dict[bw[i + j]]
-            bw_compressed.append(byte_char)
+        bw_compressed = compress_sequence(bw, p)
 
         with open(args.outfile, 'ab') as output_file:
             output_file.write(bytearray(bw_compressed))
