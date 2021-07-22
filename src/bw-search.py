@@ -9,6 +9,24 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def decompress_sequence(bw):
+    compress_dict = {
+        0b00: 'A',
+        0b01: 'C',
+        0b10: 'G',
+        0b11: 'T'
+    }
+
+    bw_decode = ''
+
+    for binary in bw:
+        for _ in range(4):
+            bw_decode += compress_dict[binary & 0b11]
+            binary = binary >> 2
+
+    return bw_decode
+
+
 def read_infile(infile):
     with open(infile, 'rb') as input_file:
         c, n, p, _ = [int(x) for x in input_file.readline().split()]
@@ -16,20 +34,7 @@ def read_infile(infile):
         bw = input_file.readline()
 
     if c:
-        compress_dict = {
-            0b00: 'A',
-            0b01: 'C',
-            0b10: 'G',
-            0b11: 'T'
-        }
-
-        bw_decode = ''
-
-        for binary in bw:
-            for _ in range(4):
-                bw_decode += compress_dict[binary & 0b11]
-                binary = binary >> 2
-
+        bw_decode = decompress_sequence(bw)
         bw = bw_decode[:n] + '$' + bw_decode[n:len(bw_decode) - p]
     else:
         bw = bw.decode('ascii')
