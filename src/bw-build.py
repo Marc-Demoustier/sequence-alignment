@@ -53,7 +53,6 @@ def burrow_wheeler_transform(sequence, frequency, k):
             for j in range(len(bucket)):
                 if frequency_counter == 0:
                     positions_index.append(str(len(sequence) - bucket[j].index('$') - 1))
-                    frequency_counter = 0
 
                 frequency_counter = (frequency_counter + 1) % frequency
 
