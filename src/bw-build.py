@@ -30,6 +30,7 @@ def burrow_wheeler_transform(sequence, frequency, k):
 
     if k:
         bwt = ''
+        frequency_counter = 0
         positions_index = []
 
         # create splitters array
@@ -43,9 +44,18 @@ def burrow_wheeler_transform(sequence, frequency, k):
                 rotation = sequence[j:] + sequence[:j]
                 if splitters[i] <= rotation < splitters[i + 1]:
                     bucket.append(rotation)
+
             bucket = sorted(bucket)
             last_column = [row[-1:] for row in bucket]  # Last characters of each row
+
             bwt += ''.join(last_column)
+
+            for j in range(len(bucket)):
+                if frequency_counter == 0:
+                    positions_index.append(str(len(sequence) - bucket[j].index('$') - 1))
+                    frequency_counter = 0
+
+                frequency_counter = (frequency_counter + 1) % frequency
 
     else:
         table = sorted(sequence[i:] + sequence[:i] for i in range(len(sequence)))  # Table of rotations of string
@@ -55,7 +65,6 @@ def burrow_wheeler_transform(sequence, frequency, k):
         # create list of indexes (position of $)
         positions_index = [str(len(table) - table[i].index('$') - 1) for i in range(0, len(table), frequency)]
 
-    print(bwt)
     return bwt, positions_index
 
 
