@@ -17,7 +17,7 @@ ou
 python script.py args
 ```
 
-Tous les scripts *Python* se trouve dans le dossier `/src`.
+Tous les scripts *Python* se trouve dans le dossier `src`.
 Les bibliothèques utilisées font parties des bibliothèques standard de Python, il n'y a rien d'autres à installer mis
 à part Python3 pour pouvoir utiliser ce projet.
 
